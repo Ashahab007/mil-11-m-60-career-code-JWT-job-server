@@ -23,6 +23,8 @@ require("dotenv").config();
 // 4.8 in the cors middleware set the origin whichis the client side root address and credentials: true
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 app.use(express.json());
+// 4.11 use the cookie parser.
+app.use(cookieParser()); // Now go to website myapllication and reload it then is server u will get "Inside application api [Object: null prototype] {}"
 
 // user name: 'career_db_admin and in password use auto generated password which is "O4t3tOchGoC21XpN". Then Built-in Role will be admin then add user.
 
@@ -117,7 +119,7 @@ async function run() {
     app.get("/applications", async (req, res) => {
       const email = req.query.email;
 
-      // 4.10 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not
+      // 4.10 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not in server terminal. But we didn't get the cookies because we didn't use cookie-parser in middleware that we have already import.
       console.log("Inside application api", req.cookies);
 
       const query = { applicant: email }; //as we send the applicant data in applicant key from the form to db. so we will query by applicant: email
