@@ -2,6 +2,8 @@ const cors = require("cors");
 const express = require("express");
 // 4.0 My requirement is after install jsonwebtoken import jwt from repo
 const jwt = require("jsonwebtoken");
+// 3.1  import cookie-parser
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,7 +14,7 @@ const port = process.env.PORT || 3000;
 // when client is call any api the server sent a token (AccessToken) and in client side the token is saved using HTTPOnlyCookies (Best method) or localStorage. When user want to get the user's data like  jobsApply etc this every time cookies is sent to server. then server decide if the user is authentic it will send the data. ANother concept is there is a another token is called refresh token. This refresh token works by renew the access token.
 
 // 3.0 How to install?
-// go to jwt website => Libraries => filter to node.js. Now copy the npm install jsonwebtoken or u can go to the view repo for setup documentation and run in server side.
+// go to jwt website => Libraries => filter to node.js. Now copy the npm install jsonwebtoken or u can go to the view repo for setup documentation and run in server side. also install cookie-parser by npm i cookie-parser and import it.
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
