@@ -25,7 +25,45 @@ app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 
 app.use(express.json());
 // 4.10 use the cookie parser.
-app.use(cookieParser()); // Now go to website myapllication and reload it then in the server terminal u will get "Inside application api [Object: null prototype] {}"
+app.use(cookieParser()); // Now go to website myapllication and reload it then in the server terminal u will get "Inside application api [Object: null prototype] {}" i.e server
+
+// 5.0 Now our requirement is to verify the token. That's why created a custom middleware which takes 3 parameter req, res, next. এখানে logger দিয়ে check করা হচ্ছে যে api টা logger টাকে hit করে কিনা।
+
+const logger = (req, res, next) => {
+  console.log("inside the logger middleware");
+  // 5.2 then call the next(). যদি আমার কাছে অনেক গুলো middleware থাকে তাহলে একটার পর একটা তে জেতে থাকবে using next()
+  next();
+};
+
+// 6.0 finally we are going to verify the token
+const verifyToken = (req, res, next) => {
+  console.log("cookie in the middleware", req.cookies);
+  // 6.2 (first get the token via middleware) call the next from this step reload the myapllication page and in server terminal u will get the the token message "cookie in the middleware {token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzaGFoYWIwMDdAZ21haWwuY29tIiwiaWF0IjoxNzQ4NzA4NTExLCJleHAiOjE3NDg3OTQ5MTF9.sTqSGIYJwYfsYGikxuc1vHkkN9JJaUTnFxAcsISJ0lg'}"
+
+  // 6.3 (first get the token via middleware) now set the token in a variable
+  const token = req?.cookies?.token;
+  console.log("cookie in the middleware by directly get the token", token);
+
+  // 7.0 before this token verification we have to verify that the token is exist or not
+  if (!token) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+
+  // 7.1 if the token exist now verifying the token according to the documentation 'https://github.com/auth0/node-jsonwebtoken'
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    // 7.2
+    if (err) {
+      return res.status(401).send({ message: "unauthorized access" });
+    }
+    // 7.3
+    req.decoded = decoded;
+    console.log(req.decoded.email); //in server terminal "ashahab007@gmail.com"
+    next();
+  });
+
+  // 6.1 call the  next() initially but its commented because we will call next when if 7.2 is false
+  // next();
+};
 
 // user name: 'career_db_admin and in password use auto generated password which is "O4t3tOchGoC21XpN". Then Built-in Role will be admin then add user.
 
@@ -71,7 +109,7 @@ async function run() {
         expiresIn: "1d",
       });
 
-      // 4.8 set token in the cookies then go to browser console => application => Cookies u will find the token
+      // 4.8 set token in the cookies then go to browser console => application => Cookies => u will find the token
       res.cookie("token", token, {
         httpOnly: true,
         secure: false,
@@ -95,14 +133,6 @@ async function run() {
       res.send(cursor);
     });
 
-    // making api for my posted jobs to show in ui (but we will not follow this because it is difficult to maintain because sometimes it needs to find the email by company name or deadline then need to create too many get operation which is difficult to maintain. so we follow 28.4)
-    /* app.get("/jobsbyemail", async (req, res) => {
-      const email = req.query.email;
-      const query = { hremail: email };
-      const result = await jobsCollections.find(query).toArray();
-      res.send(result);// if u type in browser url http://localhost:3000/jobsbyemail?email=job.hr@cob.com u will get the jobs posted by specific email
-    }); */
-
     app.get("/jobs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -116,11 +146,18 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/applications", async (req, res) => {
+    // 5.1 now set the logger middleware between "/applications" and async (req, res) .... and reload the myapplication page u will see in server terminal "inside the logger middleware" i.e hits the logger middleware. but u have to comment the 4.9 console, to see the message otherwise it will show the token.
+    // 5.4 set the verifyToken middleware between "/applications" and async (req, res) .... and reload the myapplication page.
+    app.get("/applications", logger, verifyToken, async (req, res) => {
       const email = req.query.email;
 
+      // 7.4 verify the email that is get from the token req.decoded.email with the query email
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+
       // 4.9 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not in server terminal. But we didn't get the cookies because we didn't use cookie-parser in middleware that we have already import.
-      console.log("Inside application api", req.cookies);
+      // console.log("Inside application api", req.cookies);
 
       const query = { applicant: email }; //as we send the applicant data in applicant key from the form to db. so we will query by applicant: email
 
