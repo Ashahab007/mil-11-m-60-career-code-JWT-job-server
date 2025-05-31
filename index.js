@@ -1,6 +1,6 @@
 const cors = require("cors");
 const express = require("express");
-// 4.0 My requirement is after install jsonwebtoken import jwt from repo
+// 4.0 My requirement is after install jsonwebtoken import jwt from repo documentation
 const jwt = require("jsonwebtoken");
 // 3.1  import cookie-parser
 const cookieParser = require("cookie-parser");
@@ -8,23 +8,24 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// 1.0 We art applying JWT (jsonwebtoken) in careercode project that's why to clearly understand the jwt we have delete the all comment to understand how to apply jwt.
+// 1.0 We are applying JWT (jsonwebtoken) in careercode project that's why to clearly understand the jwt we have delete the all comment to understand how to apply jwt.
 
 // 2.0 How jwt works?
-// when client is call any api the server sent a token (AccessToken) and in client side the token is saved using HTTPOnlyCookies (Best method) or localStorage. When user want to get the user's data like  jobsApply etc this every time cookies is sent to server. then server decide if the user is authentic it will send the data. ANother concept is there is a another token is called refresh token. This refresh token works by renew the access token.
+// when client is call any api the server sent a token (AccessToken) and in client side the token is saved using HTTPOnlyCookies (Best method) or localStorage (not a best method). When user want to get the user's data like  jobsApply etc every time cookies is sent to server. then server decide if the user is authentic it will send the data. sometimes another token is also sent which is called refresh token. This refresh token works by renew the access token.
 
 // 3.0 How to install?
-// go to jwt website => Libraries => filter to node.js. Now copy the npm install jsonwebtoken or u can go to the view repo for setup documentation and run in server side. also install cookie-parser by npm i cookie-parser and import it.
+// go to jwt website => Libraries => filter to node.js. Now copy the npm install jsonwebtoken or u can go to the view repo for setup documentation and run in server side. also install cookie-parser by npm i cookie-parser and import it in 3.1.
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 // middleware
-// 4.8 in the cors middleware set the origin whichis the client side root address and credentials: true
+// 4.7 in the cors middleware set the origin which is the client side root address and {credentials: true}
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
+
 app.use(express.json());
-// 4.11 use the cookie parser.
-app.use(cookieParser()); // Now go to website myapllication and reload it then is server u will get "Inside application api [Object: null prototype] {}"
+// 4.10 use the cookie parser.
+app.use(cookieParser()); // Now go to website myapllication and reload it then in the server terminal u will get "Inside application api [Object: null prototype] {}"
 
 // user name: 'career_db_admin and in password use auto generated password which is "O4t3tOchGoC21XpN". Then Built-in Role will be admin then add user.
 
@@ -53,7 +54,7 @@ async function run() {
       .db("carrerCode")
       .collection("applications");
 
-    // 4.3 create the jwt token api. As we get data the  data from the client side we use post method and receive the email
+    // 4.3 create the jwt token api. As we get the  data from the client side we use post method and receive the email im userData
     app.post("/jwt", async (req, res) => {
       const userData = req.body;
       // const user = { email };
@@ -69,14 +70,13 @@ async function run() {
       const token = jwt.sign(userData, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-      // 4.5 send the token as object or u can directly send the token
 
-      // 4.9 set token in the cookies then go to browser console => application => Cookies u will find the token
+      // 4.8 set token in the cookies then go to browser console => application => Cookies u will find the token
       res.cookie("token", token, {
         httpOnly: true,
         secure: false,
       });
-      // 4.6 sending a message to see the message in browser console
+      // 4.5 sending a message to see the message in browser console
       res.send({ success: true });
     });
 
@@ -119,7 +119,7 @@ async function run() {
     app.get("/applications", async (req, res) => {
       const email = req.query.email;
 
-      // 4.10 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not in server terminal. But we didn't get the cookies because we didn't use cookie-parser in middleware that we have already import.
+      // 4.9 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not in server terminal. But we didn't get the cookies because we didn't use cookie-parser in middleware that we have already import.
       console.log("Inside application api", req.cookies);
 
       const query = { applicant: email }; //as we send the applicant data in applicant key from the form to db. so we will query by applicant: email
