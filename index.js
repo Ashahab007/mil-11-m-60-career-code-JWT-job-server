@@ -68,7 +68,12 @@ async function run() {
         expiresIn: "1d",
       });
       // 4.5 send the token as object or u can directly send the token
-      // res.send({ token });
+
+      // 4.9 set token in the cookies then go to browser console => application => Cookies u will find the token
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+      });
       // 4.6 sending a message to see the message in browser console
       res.send({ success: true });
     });
@@ -111,6 +116,10 @@ async function run() {
 
     app.get("/applications", async (req, res) => {
       const email = req.query.email;
+
+      // 4.10 as the token is send to specific email so we are going to check that the specific email is getting the cookies or not
+      console.log("Inside application api", req.cookies);
+
       const query = { applicant: email }; //as we send the applicant data in applicant key from the form to db. so we will query by applicant: email
 
       const result = await applicationsCollections.find(query).toArray();
