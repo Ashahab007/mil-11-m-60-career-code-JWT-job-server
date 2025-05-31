@@ -20,7 +20,8 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 // middleware
-app.use(cors());
+// 4.8 in the cors middleware set the origin whichis the client side root address and credentials: true
+app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 app.use(express.json());
 
 // user name: 'career_db_admin and in password use auto generated password which is "O4t3tOchGoC21XpN". Then Built-in Role will be admin then add user.
@@ -64,10 +65,12 @@ async function run() {
        * then set as process.env.JWT_SECRET
        */
       const token = jwt.sign(userData, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "1d",
       });
       // 4.5 send the token as object or u can directly send the token
-      res.send({ token });
+      // res.send({ token });
+      // 4.6 sending a message to see the message in browser console
+      res.send({ success: true });
     });
 
     app.get("/jobs", async (req, res) => {
