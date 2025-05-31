@@ -55,8 +55,17 @@ async function run() {
       const userData = req.body;
       // const user = { email };
 
-      // 4.4 creating the token as per documentation from github and in secret we use environment variable
-      const token = jwt.sign(userData, "secret", { expiresIn: "1h" });
+      // 4.4 creating the token as per documentation from github and in secret we use environment variable to generate random token. steps are following for generate random token
+      /**
+       * in terminal type node
+       * then type require('crypto').randomBytes(64)
+       * then convert to string "require('crypto').randomBytes(64).toString('hex')"
+       * then copy the generated token and save to .env file as JWT_SECRET=55c7203f06a5b582b61d255d80bbc123abc9079e64847660533233b525561bb2a06228c131d441ebf3492ba0c99c1fb087f21c98a73a2b98c6c30d0d4fc9d2d1
+       * then set as process.env.JWT_SECRET
+       */
+      const token = jwt.sign(userData, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
       // 4.5 send the token as object or u can directly send the token
       res.send({ token });
     });
