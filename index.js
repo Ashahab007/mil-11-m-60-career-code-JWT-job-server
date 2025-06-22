@@ -147,7 +147,7 @@ async function run() {
     });
 
     // 5.1 now set the logger middleware between "/applications" and async (req, res) .... and reload the myapplication page u will see in server terminal "inside the logger middleware" i.e hits the logger middleware. but u have to comment the 4.9 console, to see the message otherwise it will show the token.
-    // 5.4 set the verifyToken middleware between "/applications" and async (req, res) .... and reload the myapplication page.
+    // 6.4 set the verifyToken middleware between "/applications" and async (req, res) .... and reload the myapplication page.
     app.get("/applications", logger, verifyToken, async (req, res) => {
       const email = req.query.email;
 
